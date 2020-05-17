@@ -42,7 +42,7 @@ void TableToTreeModel::headerDataChangedSlot(Qt::Orientation orientation, int fi
         return;
 
     //TODO improve ?
-    int columnCount = this->sourceModel->columnCount() - this->aggregatedColumns.size();
+    int columnCount = this->sourceModel->columnCount() - this->aggregatedColumns.size() + 1;
     emit headerDataChanged(orientation, 0, columnCount);
 }
 
@@ -113,7 +113,7 @@ void TableToTreeModel::modelResetSlot()
             if(sourceIndex.isValid())
             {
                 // create index
-                QModelIndex childIndex = this->createIndex(parentNode->lines.size(), j, childNode);
+                QModelIndex childIndex = this->createIndex(parentNode->lines.size(), j+1, childNode);
 
                 // add it to node
                 childNode->proxyIndexes.append(childIndex);
@@ -217,10 +217,13 @@ QModelIndex TableToTreeModel::index(int row, int column, const QModelIndex& pare
     }
     else
     {
-        if(column >= childNode->proxyIndexes.size())
+        if(column == 0)
+            return this->createIndex(row, 0, childNode);
+
+        if(column-1 >= childNode->proxyIndexes.size())
             return QModelIndex();
 
-        return childNode->proxyIndexes.at(column);
+        return childNode->proxyIndexes.at(column-1);
     }
 }
 
@@ -259,7 +262,7 @@ int TableToTreeModel::columnCount(const QModelIndex& parent) const
 //        return static_cast<TableToTreeNode*>(parent.internalPointer())->proxyIndexes.size();
 //    return 1;
 
-    return this->sourceModel->columnCount() - this->aggregatedColumns.size();
+    return this->sourceModel->columnCount() - this->aggregatedColumns.size() + 1;
 }
 
 QVariant TableToTreeModel::data(const QModelIndex& index, int role) const
@@ -275,10 +278,10 @@ QVariant TableToTreeModel::headerData(int section, Qt::Orientation orientation, 
     if(orientation == Qt::Vertical)
         return QVariant();
 
-    if(section < 0)
+    if(section < 1)
         return QVariant();
 
-    int mappedSection = this->mapSectionToSource(section);
+    int mappedSection = this->mapSectionToSource(section-1);
 
     if(mappedSection < 0 || mappedSection >= this->sourceModel->columnCount())
         return QVariant();
