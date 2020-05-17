@@ -4,7 +4,11 @@
 #include <QMainWindow>
 #include <QtMath>
 #include <QTableView>
+#include <QTreeView>
+#include <QHeaderView>
+#include <QHBoxLayout>
 #include <QAbstractTableModel>
+#include "tabletotreemodel.h"
 
 class DemoTableModel : public QAbstractTableModel
 {

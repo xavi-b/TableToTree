@@ -20,7 +20,7 @@ struct TableToTreeNode
         return 0;
     }
 
-    bool isParent = false;
+    bool isAnAggregate = true;
     TableToTreeNode* parent = nullptr;
     QVector<TableToTreeNode*> lines;
     QVector<QPersistentModelIndex> proxyIndexes;
@@ -31,6 +31,7 @@ class TableToTreeModel : public QAbstractItemModel
 private:
     QAbstractTableModel* sourceModel = nullptr;
     std::vector<int> aggregatedColumns;
+    int aggregationRole = Qt::DisplayRole;
     QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
     TableToTreeNode* rootNode = nullptr;
 
@@ -54,8 +55,10 @@ private:
     void rowsRemovedSlot(const QModelIndex &parent, int first, int last);
 
 public:
+    TableToTreeModel(QObject* parent = nullptr);
     ~TableToTreeModel();
     void setSourceModel(QAbstractTableModel* sourceModel);
+    void setAggregationRole(int aggregationRole);
     void addAggregatedColumns(int section);
     void insertAggregatedColumns(int index, int section);
     void removeAggregatedColumns(int section);

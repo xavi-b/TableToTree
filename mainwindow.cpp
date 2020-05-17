@@ -38,10 +38,23 @@ QVariant DemoTableModel::headerData(int section, Qt::Orientation orientation, in
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    QHBoxLayout* layout = new QHBoxLayout;
+    QWidget* centralWidget = new QWidget;
+    centralWidget->setLayout(layout);
+    setCentralWidget(centralWidget);
+
     DemoTableModel* tableModel = new DemoTableModel;
     QTableView* tableView = new QTableView;
     tableView->setModel(tableModel);
-    setCentralWidget(tableView);
+    layout->addWidget(tableView);
+
+    TableToTreeModel* treeModel = new TableToTreeModel;
+    treeModel->addAggregatedColumns(1);
+    treeModel->setSourceModel(tableModel);
+    QTreeView* treeView = new QTreeView;
+    treeView->header()->setStretchLastSection(false);
+    treeView->setModel(treeModel);
+    layout->addWidget(treeView);
 }
 
 MainWindow::~MainWindow()

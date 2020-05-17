@@ -38,7 +38,6 @@ void TableToTreeModel::dataChangedSlot(const QModelIndex& topLeft, const QModelI
 
 void TableToTreeModel::headerDataChangedSlot(Qt::Orientation orientation, int first, int last)
 {
-    //TODO vertical ?
     if(orientation == Qt::Vertical)
         return;
 
@@ -54,7 +53,7 @@ void TableToTreeModel::layoutChangedSlot(const QList<QPersistentModelIndex>& par
 
 void TableToTreeModel::modelResetSlot()
 {
-    this->beginResetModel();
+    emit layoutAboutToBeChanged();
 
     this->mapping.clear();
 
@@ -75,27 +74,59 @@ void TableToTreeModel::modelResetSlot()
 
     for(int i = 0; i < this->sourceModel->rowCount(); ++i)
     {
+        TableToTreeNode* parentNode = this->rootNode;
         for(size_t k = 0; k < this->aggregatedColumns.size(); ++k)
         {
-            //proxyindex data contains aggregatedcolumn value
-            //find parent tabletotreenode
-            //create nodes if does not exist
-
-            //create indexes and add them to node and mapping
-            for(int j = 0; j < columnCount; ++j)
+            QModelIndex sourceIndex = this->sourceModel->index(i, this->aggregatedColumns[k]);
+            auto it = std::find_if(parentNode->lines.begin(), parentNode->lines.end(), [&](TableToTreeNode* child)
             {
-                QModelIndex sourceIndex = this->sourceModel->index(i, mappedSections[j]);
+                return child->proxyIndexes.at(0).data(this->aggregationRole) == sourceIndex.data(this->aggregationRole);
+            });
 
-                if(sourceIndex.isValid())
-                {
-                    //TODO add to mapping
-                    //TODO add to node
-                }
+            // create node if it does not exist
+            if(it == parentNode->lines.end())
+            {
+                TableToTreeNode* childNode = new TableToTreeNode;
+                QModelIndex childIndex = this->createIndex(parentNode->lines.size(), 0, childNode);
+                childNode->parent = parentNode;
+                childNode->proxyIndexes.append(childIndex);
+                parentNode->isAnAggregate = true;
+                parentNode->lines.append(childNode);
+                parentNode = childNode;
+
+                this->mapping.insert(sourceIndex, childIndex);
+            }
+            else
+            {
+                parentNode = *it;
             }
         }
+
+        TableToTreeNode* childNode = new TableToTreeNode;
+        childNode->isAnAggregate = false;
+        childNode->parent = parentNode;
+
+        for(int j = 0; j < columnCount; ++j)
+        {
+            QModelIndex sourceIndex = this->sourceModel->index(i, mappedSections[j]);
+
+            if(sourceIndex.isValid())
+            {
+                // create index
+                QModelIndex childIndex = this->createIndex(i, j, childNode);
+
+                // add it to node
+                childNode->proxyIndexes.append(childIndex);
+
+                // add it to mapping
+                this->mapping.insert(sourceIndex, childIndex);
+            }
+        }
+
+        parentNode->lines.append(childNode);
     }
 
-    this->endResetModel();
+    emit layoutChanged();
 }
 
 void TableToTreeModel::rowsInsertedSlot(const QModelIndex& parent, int first, int last)
@@ -113,6 +144,12 @@ void TableToTreeModel::rowsRemovedSlot(const QModelIndex& parent, int first, int
 
 }
 
+TableToTreeModel::TableToTreeModel(QObject* parent)
+    : QAbstractItemModel(parent)
+{
+    this->rootNode = new TableToTreeNode;
+}
+
 TableToTreeModel::~TableToTreeModel()
 {
     if(this->rootNode != nullptr)
@@ -126,6 +163,11 @@ void TableToTreeModel::setSourceModel(QAbstractTableModel* sourceModel)
 
     this->sourceModel = sourceModel;
     this->modelResetSlot();
+}
+
+void TableToTreeModel::setAggregationRole(int aggregationRole)
+{
+    this->aggregationRole = aggregationRole;
 }
 
 void TableToTreeModel::addAggregatedColumns(int section)
@@ -164,10 +206,16 @@ QModelIndex TableToTreeModel::index(int row, int column, const QModelIndex& pare
     else
         parentNode = static_cast<TableToTreeNode*>(parent.internalPointer());
 
+    if(row >= parentNode->lines.size())
+        return QModelIndex();
+
     TableToTreeNode* childNode = parentNode->lines.at(row);
 
-    if(childNode->isParent)
+    if(childNode->isAnAggregate)
     {
+        if(column > 0)
+            return QModelIndex();
+
         return childNode->proxyIndexes.at(0);
     }
     else
@@ -197,22 +245,24 @@ int TableToTreeModel::rowCount(const QModelIndex& parent) const
 {
     TableToTreeNode* parentNode;
 
-    if (parent.column() > 0)
-        return 0;
-
     if (!parent.isValid())
         parentNode = this->rootNode;
     else
         parentNode = static_cast<TableToTreeNode*>(parent.internalPointer());
 
-    return parentNode->lines.count();
+    if(!parentNode->isAnAggregate)
+        return 1;
+
+    return parentNode->lines.size();
 }
 
 int TableToTreeModel::columnCount(const QModelIndex& parent) const
 {
-    if (parent.isValid())
-        return static_cast<TableToTreeNode*>(parent.internalPointer())->proxyIndexes.size();
-    return this->rootNode->proxyIndexes.size();
+//    if(parent.isValid())
+//        return static_cast<TableToTreeNode*>(parent.internalPointer())->proxyIndexes.size();
+//    return 1;
+
+    return this->sourceModel->columnCount() - this->aggregatedColumns.size();
 }
 
 QVariant TableToTreeModel::data(const QModelIndex& index, int role) const
@@ -222,7 +272,9 @@ QVariant TableToTreeModel::data(const QModelIndex& index, int role) const
 
 QVariant TableToTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    //TODO vertical ?
+    if(this->sourceModel == nullptr)
+        return QVariant();
+
     if(orientation == Qt::Vertical)
         return QVariant();
 
