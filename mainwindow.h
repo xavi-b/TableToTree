@@ -7,7 +7,10 @@
 #include <QTreeView>
 #include <QHeaderView>
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
+#include <QDateTime>
 #include "tabletotreemodel.h"
 
 class DemoTableModel : public QAbstractTableModel
@@ -17,6 +20,17 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+};
+
+class DemoSortProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    DemoSortProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) { }
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
 class MainWindow : public QMainWindow

@@ -35,27 +35,55 @@ QVariant DemoTableModel::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
+bool DemoSortProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+
+    if (leftData.type() == QVariant::DateTime)
+    {
+        return leftData.toDateTime() < rightData.toDateTime();
+    }
+    else
+    {
+        return QString::localeAwareCompare(leftData.toString(), rightData.toString()) < 0;
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    QHBoxLayout* layout = new QHBoxLayout;
+    QVBoxLayout* layout = new QVBoxLayout;
     QWidget* centralWidget = new QWidget;
     centralWidget->setLayout(layout);
     setCentralWidget(centralWidget);
+    QHBoxLayout* hlayout = new QHBoxLayout;
+    layout->addLayout(hlayout);
 
     DemoTableModel* tableModel = new DemoTableModel;
     QTableView* tableView = new QTableView;
     tableView->setModel(tableModel);
-    layout->addWidget(tableView);
+    hlayout->addWidget(tableView);
 
     TableToTreeModel* treeModel = new TableToTreeModel;
     treeModel->addAggregatedColumns(2);
     treeModel->addAggregatedColumns(4);
     treeModel->setSourceModel(tableModel);
     QTreeView* treeView = new QTreeView;
+    treeView->setSortingEnabled(true);
+    treeView->setAlternatingRowColors(true);
     treeView->header()->setStretchLastSection(false);
-    treeView->setModel(treeModel);
-    layout->addWidget(treeView);
+    DemoSortProxyModel* proxyModel = new DemoSortProxyModel;
+    proxyModel->setSourceModel(treeModel);
+    treeView->setModel(proxyModel);
+    hlayout->addWidget(treeView);
+
+    QPushButton* btn = new QPushButton;
+    layout->addWidget(btn);
+    connect(btn, &QPushButton::clicked, this, [=]()
+    {
+
+    });
 }
 
 MainWindow::~MainWindow()
