@@ -49,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(tableView);
 
     TableToTreeModel* treeModel = new TableToTreeModel;
-    treeModel->addAggregatedColumns(1);
+    treeModel->addAggregatedColumns(2);
+    treeModel->addAggregatedColumns(4);
     treeModel->setSourceModel(tableModel);
     QTreeView* treeView = new QTreeView;
     treeView->header()->setStretchLastSection(false);

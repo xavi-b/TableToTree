@@ -113,7 +113,7 @@ void TableToTreeModel::modelResetSlot()
             if(sourceIndex.isValid())
             {
                 // create index
-                QModelIndex childIndex = this->createIndex(i, j, childNode);
+                QModelIndex childIndex = this->createIndex(parentNode->lines.size(), j, childNode);
 
                 // add it to node
                 childNode->proxyIndexes.append(childIndex);
@@ -206,6 +206,7 @@ QModelIndex TableToTreeModel::index(int row, int column, const QModelIndex& pare
     else
         parentNode = static_cast<TableToTreeNode*>(parent.internalPointer());
 
+    //TODO causes branch indicator to appear but solves crash, to investigate
     if(row >= parentNode->lines.size())
         return QModelIndex();
 
