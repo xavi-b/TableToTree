@@ -206,10 +206,6 @@ QModelIndex TableToTreeModel::index(int row, int column, const QModelIndex& pare
     else
         parentNode = static_cast<TableToTreeNode*>(parent.internalPointer());
 
-    //TODO causes branch indicator to appear but solves crash, to investigate
-    if(row >= parentNode->lines.size())
-        return QModelIndex();
-
     TableToTreeNode* childNode = parentNode->lines.at(row);
 
     if(childNode->isAnAggregate)
@@ -252,7 +248,7 @@ int TableToTreeModel::rowCount(const QModelIndex& parent) const
         parentNode = static_cast<TableToTreeNode*>(parent.internalPointer());
 
     if(!parentNode->isAnAggregate)
-        return 1;
+        return 0;
 
     return parentNode->lines.size();
 }
