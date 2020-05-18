@@ -86,6 +86,8 @@ MainWindow::MainWindow(QWidget *parent)
     treeModel->addAggregatedColumns(2);
     treeModel->addAggregatedColumns(4);
 
+    connect(treeModel, &TableToTreeModel::mappedSectionRoleChanged, treeWidget, &TableToTreeWidget::mappedSectionRoleChangedSlot);
+
     QPushButton* btn = new QPushButton;
     layout->addWidget(btn);
     connect(btn, &QPushButton::clicked, this, [=]()

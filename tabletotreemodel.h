@@ -33,6 +33,7 @@ private:
     QAbstractTableModel* sourceModel = nullptr;
     std::vector<int> aggregatedColumns;
     int aggregationRole = Qt::DisplayRole;
+    int mappedSectionRole = Qt::UserRole;
     QMap<QPersistentModelIndex, QPersistentModelIndex> mapping;
     TableToTreeNode* rootNode = nullptr;
 
@@ -61,6 +62,9 @@ public:
     void setSourceModel(QAbstractTableModel* sourceModel);
     QAbstractTableModel* getSourceModel();
     void setAggregationRole(int aggregationRole);
+    int getAggregationRole() const;
+    void setMappedSectionRole(int mappedSectionRole);
+    int getMappedSectionRole() const;
     void setAggregatedColumns(std::vector<int> const& sections);
     void addAggregatedColumns(int section);
     void insertAggregatedColumns(int index, int section);
@@ -80,6 +84,7 @@ public:
 //    QItemSelection mapSelectionToSource(const QItemSelection &proxySelection) const;
 
 signals:
+    void mappedSectionRoleChanged(TableToTreeModel* treeModel);
     void aggregationChanged(TableToTreeModel* treeModel);
 };
 

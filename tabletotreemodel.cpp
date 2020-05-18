@@ -180,6 +180,22 @@ void TableToTreeModel::setAggregationRole(int aggregationRole)
     emit aggregationChanged(this);
 }
 
+int TableToTreeModel::getAggregationRole() const
+{
+    return this->aggregationRole;
+}
+
+void TableToTreeModel::setMappedSectionRole(int mappedSectionRole)
+{
+    this->mappedSectionRole = mappedSectionRole;
+    emit mappedSectionRoleChanged(this);
+}
+
+int TableToTreeModel::getMappedSectionRole() const
+{
+    return this->mappedSectionRole;
+}
+
 void TableToTreeModel::setAggregatedColumns(const std::vector<int>& sections)
 {
     this->aggregatedColumns = sections;
@@ -311,6 +327,9 @@ QVariant TableToTreeModel::headerData(int section, Qt::Orientation orientation, 
 
     if(mappedSection < 0 || mappedSection >= this->sourceModel->columnCount())
         return QVariant();
+
+    if(role == this->mappedSectionRole)
+        return mappedSection;
 
     return this->sourceModel->headerData(mappedSection, orientation, role);
 }

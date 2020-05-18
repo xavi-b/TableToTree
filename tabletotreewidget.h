@@ -37,6 +37,9 @@ signals:
 class TableToTreeHeaderView : public QHeaderView
 {
     Q_OBJECT
+private:
+    int mappedSectionRole = Qt::UserRole;
+
 protected:
     void mouseMoveEvent(QMouseEvent *event);
     void dragMoveEvent(QDragMoveEvent* e);
@@ -46,6 +49,7 @@ protected:
 
 public:
     TableToTreeHeaderView(QWidget* parent = nullptr);
+    void setMappedSectionRole(int mappedSectionRole);
 
 signals:
     void aggregationChanged();
@@ -70,6 +74,7 @@ public:
     TableToTreeWidget(QWidget *parent = nullptr);
     TableToTreeView* getTreeView();
     void aggregationChangedSlot(TableToTreeModel* treeModel);
+    void mappedSectionRoleChangedSlot(TableToTreeModel* treeModel);
 
 signals:
     void aggregationChanged(std::vector<int> sections);

@@ -26,8 +26,17 @@ void AggregationListWidget::dropEvent(QDropEvent* event)
         stream >> column;
         stream >> name;
 
-        //TODO drop correct place
-        addItem(column, name);
+        auto item = itemAt(event->pos());
+        if(item == nullptr)
+            addItem(column, name);
+        else
+        {
+            int r = row(item);
+            QListWidgetItem* item = new QListWidgetItem;
+            item->setText(name);
+            item->setData(Qt::UserRole, column);
+            insertItem(r, item);
+        }
 
         // drop will either add or move aggregation column
         emit aggregationChanged();
@@ -176,14 +185,12 @@ void TableToTreeHeaderView::mouseMoveEvent(QMouseEvent *event)
     {
         if(!this->rect().contains(event->pos()))
         {
-            //TODO
-            //index error
             int index = logicalIndexAt(event->pos());
             QMimeData* mimeData = new QMimeData;
             QByteArray ba;
             QDataStream stream(&ba, QIODevice::WriteOnly);
-            stream << index;
-            stream << this->model()->index(0, index).data(Qt::DisplayRole).toString();
+            stream << this->model()->headerData(index, Qt::Horizontal, this->mappedSectionRole).toInt();
+            stream << this->model()->headerData(index, Qt::Horizontal, Qt::DisplayRole).toString();
             mimeData->setData(mimeDataType, ba);
             QDrag* drag = new QDrag(this);
             drag->setMimeData(mimeData);
@@ -206,6 +213,11 @@ TableToTreeHeaderView::TableToTreeHeaderView(QWidget* parent)
     this->setAcceptDrops(true);
     this->setStretchLastSection(false);
     this->setSectionsMovable(true);
+}
+
+void TableToTreeHeaderView::setMappedSectionRole(int mappedSectionRole)
+{
+    this->mappedSectionRole = mappedSectionRole;
 }
 
 TableToTreeView::TableToTreeView(QWidget* parent)
@@ -250,4 +262,11 @@ void TableToTreeWidget::aggregationChangedSlot(TableToTreeModel* treeModel)
 
     for(auto const& c : treeModel->getAggregatedColumns())
         this->aggregationListWidget->addItem(c, treeModel->getSourceModel()->headerData(c, Qt::Horizontal).toString());
+
+    this->headerView->setMappedSectionRole(treeModel->getMappedSectionRole());
+}
+
+void TableToTreeWidget::mappedSectionRoleChangedSlot(TableToTreeModel* treeModel)
+{
+    this->headerView->setMappedSectionRole(treeModel->getMappedSectionRole());
 }
