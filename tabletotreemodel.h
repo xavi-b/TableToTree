@@ -28,6 +28,7 @@ struct TableToTreeNode
 
 class TableToTreeModel : public QAbstractItemModel
 {
+    Q_OBJECT
 private:
     QAbstractTableModel* sourceModel = nullptr;
     std::vector<int> aggregatedColumns;
@@ -58,11 +59,14 @@ public:
     TableToTreeModel(QObject* parent = nullptr);
     ~TableToTreeModel();
     void setSourceModel(QAbstractTableModel* sourceModel);
+    QAbstractTableModel* getSourceModel();
     void setAggregationRole(int aggregationRole);
+    void setAggregatedColumns(std::vector<int> const& sections);
     void addAggregatedColumns(int section);
     void insertAggregatedColumns(int index, int section);
     void removeAggregatedColumns(int section);
     void clearAggregatedColumns();
+    std::vector<int> const& getAggregatedColumns() const;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -74,6 +78,9 @@ public:
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
 //    QItemSelection mapSelectionFromSource(const QItemSelection &sourceSelection) const;
 //    QItemSelection mapSelectionToSource(const QItemSelection &proxySelection) const;
+
+signals:
+    void aggregationChanged(TableToTreeModel* treeModel);
 };
 
 

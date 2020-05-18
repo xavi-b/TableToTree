@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    tabletotreemodel.cpp
+    tabletotreemodel.cpp \
+    tabletotreewidget.cpp
 
 HEADERS += \
     mainwindow.h \
-    tabletotreemodel.h
+    tabletotreemodel.h \
+    tabletotreewidget.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -12,6 +12,7 @@
 #include <QSortFilterProxyModel>
 #include <QDateTime>
 #include "tabletotreemodel.h"
+#include "tabletotreewidget.h"
 
 class DemoTableModel : public QAbstractTableModel
 {
@@ -28,6 +29,7 @@ class DemoSortProxyModel : public QSortFilterProxyModel
 
 public:
     DemoSortProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) { }
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;

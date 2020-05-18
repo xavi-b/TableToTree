@@ -27,12 +27,17 @@ QVariant DemoTableModel::headerData(int section, Qt::Orientation orientation, in
         return QVariant();
 
     if(role == Qt::DisplayRole && orientation == Qt::Horizontal)
-        return QString('a'+section);
+        return QString("column_%1").arg(QChar('a'+section));
 
     if(role == Qt::DisplayRole && orientation == Qt::Vertical)
         return QString::number(section+1);
 
     return QVariant();
+}
+
+QVariant DemoSortProxyModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    return this->sourceModel()->headerData(section, orientation, role);
 }
 
 bool DemoSortProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
@@ -66,17 +71,20 @@ MainWindow::MainWindow(QWidget *parent)
     hlayout->addWidget(tableView);
 
     TableToTreeModel* treeModel = new TableToTreeModel;
-    treeModel->addAggregatedColumns(2);
-    treeModel->addAggregatedColumns(4);
     treeModel->setSourceModel(tableModel);
-    QTreeView* treeView = new QTreeView;
-    treeView->setSortingEnabled(true);
-    treeView->setAlternatingRowColors(true);
-    treeView->header()->setStretchLastSection(false);
+    TableToTreeWidget* treeWidget = new TableToTreeWidget;
     DemoSortProxyModel* proxyModel = new DemoSortProxyModel;
     proxyModel->setSourceModel(treeModel);
-    treeView->setModel(proxyModel);
-    hlayout->addWidget(treeView);
+    treeWidget->getTreeView()->setSortingEnabled(true);
+    treeWidget->getTreeView()->setModel(proxyModel);
+    treeWidget->getTreeView()->expandAll();
+    treeWidget->aggregationChangedSlot(treeModel);
+    hlayout->addWidget(treeWidget);
+
+    connect(treeWidget, &TableToTreeWidget::aggregationChanged, treeModel, &TableToTreeModel::setAggregatedColumns);
+    connect(treeModel, &TableToTreeModel::aggregationChanged, treeWidget, &TableToTreeWidget::aggregationChangedSlot);
+    treeModel->addAggregatedColumns(2);
+    treeModel->addAggregatedColumns(4);
 
     QPushButton* btn = new QPushButton;
     layout->addWidget(btn);

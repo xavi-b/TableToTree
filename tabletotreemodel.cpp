@@ -55,6 +55,9 @@ void TableToTreeModel::modelResetSlot()
 {
     emit layoutAboutToBeChanged();
 
+    this->beginResetModel();
+    this->endResetModel();
+
     this->mapping.clear();
 
     if(this->rootNode != nullptr)
@@ -165,33 +168,56 @@ void TableToTreeModel::setSourceModel(QAbstractTableModel* sourceModel)
     this->modelResetSlot();
 }
 
+QAbstractTableModel* TableToTreeModel::getSourceModel()
+{
+    return this->sourceModel;
+}
+
 void TableToTreeModel::setAggregationRole(int aggregationRole)
 {
     this->aggregationRole = aggregationRole;
+    this->modelResetSlot();
+    emit aggregationChanged(this);
+}
+
+void TableToTreeModel::setAggregatedColumns(const std::vector<int>& sections)
+{
+    this->aggregatedColumns = sections;
+    this->modelResetSlot();
+    emit aggregationChanged(this);
 }
 
 void TableToTreeModel::addAggregatedColumns(int section)
 {
     this->aggregatedColumns.push_back(section);
     this->modelResetSlot();
+    emit aggregationChanged(this);
 }
 
 void TableToTreeModel::insertAggregatedColumns(int index, int section)
 {
     this->aggregatedColumns.insert(this->aggregatedColumns.begin() + index, section);
     this->modelResetSlot();
+    emit aggregationChanged(this);
 }
 
 void TableToTreeModel::removeAggregatedColumns(int section)
 {
     this->aggregatedColumns.erase(std::find(this->aggregatedColumns.begin(), this->aggregatedColumns.end(), section));
     this->modelResetSlot();
+    emit aggregationChanged(this);
 }
 
 void TableToTreeModel::clearAggregatedColumns()
 {
     this->aggregatedColumns.clear();
     this->modelResetSlot();
+    emit aggregationChanged(this);
+}
+
+std::vector<int> const& TableToTreeModel::getAggregatedColumns() const
+{
+    return this->aggregatedColumns;
 }
 
 QModelIndex TableToTreeModel::index(int row, int column, const QModelIndex& parent) const
