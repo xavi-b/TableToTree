@@ -173,12 +173,6 @@ void TableToTreeHeaderView::dropEvent(QDropEvent *event)
     }
 }
 
-void TableToTreeHeaderView::startDrag(Qt::DropActions supportedActions)
-{
-    //TODO
-    //stop section moving ?
-}
-
 void TableToTreeHeaderView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
@@ -196,8 +190,9 @@ void TableToTreeHeaderView::mouseMoveEvent(QMouseEvent *event)
             drag->setMimeData(mimeData);
             if(drag->exec(Qt::MoveAction) == Qt::MoveAction)
             {
-                //TODO
-                //stop section moving ?
+                //TRICK to "cancel" moving section
+                QMouseEvent mouseEvent(QEvent::MouseMove, event->localPos(), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+                QApplication::sendEvent(this, &mouseEvent);
                 return;
             }
         }

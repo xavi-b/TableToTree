@@ -45,7 +45,6 @@ protected:
     void dragMoveEvent(QDragMoveEvent* e);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
-    void startDrag(Qt::DropActions supportedActions);
 
 public:
     TableToTreeHeaderView(QWidget* parent = nullptr);
