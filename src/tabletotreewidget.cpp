@@ -109,6 +109,7 @@ AggregationListWidget::AggregationListWidget(QWidget* parent)
     this->setAcceptDrops(true);
     this->setDropIndicatorShown(true);
     this->setDragEnabled(true);
+    this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 }
 
 void AggregationListWidget::addItem(int column, QString name)
@@ -232,7 +233,7 @@ TableToTreeWidget::TableToTreeWidget(QWidget *parent) : QWidget(parent)
     this->treeView->setHeader(this->headerView);
 
     layout->addWidget(this->aggregationListWidget);
-    layout->addWidget(this->treeView);
+    layout->addWidget(this->treeView, 1);
     this->setLayout(layout);
 
     connect(this->aggregationListWidget, &AggregationListWidget::aggregationChanged, this, [=]()
@@ -251,7 +252,7 @@ TableToTreeView* TableToTreeWidget::getTreeView()
     return this->treeView;
 }
 
-void TableToTreeWidget::aggregationChangedSlot(TableToTreeModel* treeModel)
+void TableToTreeWidget::changeAggregation(TableToTreeModel* treeModel)
 {
     this->aggregationListWidget->clear();
 
@@ -261,7 +262,7 @@ void TableToTreeWidget::aggregationChangedSlot(TableToTreeModel* treeModel)
     this->headerView->setMappedSectionRole(treeModel->getMappedSectionRole());
 }
 
-void TableToTreeWidget::mappedSectionRoleChangedSlot(TableToTreeModel* treeModel)
+void TableToTreeWidget::changeMappedSectionRole(TableToTreeModel* treeModel)
 {
     this->headerView->setMappedSectionRole(treeModel->getMappedSectionRole());
 }

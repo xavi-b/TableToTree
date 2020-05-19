@@ -72,8 +72,8 @@ private:
 public:
     TableToTreeWidget(QWidget *parent = nullptr);
     TableToTreeView* getTreeView();
-    void aggregationChangedSlot(TableToTreeModel* treeModel);
-    void mappedSectionRoleChangedSlot(TableToTreeModel* treeModel);
+    void changeAggregation(TableToTreeModel* treeModel);
+    void changeMappedSectionRole(TableToTreeModel* treeModel);
 
 signals:
     void aggregationChanged(std::vector<int> sections);

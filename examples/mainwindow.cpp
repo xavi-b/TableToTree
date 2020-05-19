@@ -77,16 +77,16 @@ MainWindow::MainWindow(QWidget *parent)
     proxyModel->setSourceModel(treeModel);
     treeWidget->getTreeView()->setSortingEnabled(true);
     treeWidget->getTreeView()->setModel(proxyModel);
-    treeWidget->getTreeView()->expandAll();
-    treeWidget->aggregationChangedSlot(treeModel);
+    treeWidget->changeAggregation(treeModel);
     hlayout->addWidget(treeWidget);
 
     connect(treeWidget, &TableToTreeWidget::aggregationChanged, treeModel, &TableToTreeModel::setAggregatedColumns);
-    connect(treeModel, &TableToTreeModel::aggregationChanged, treeWidget, &TableToTreeWidget::aggregationChangedSlot);
+    connect(treeModel, &TableToTreeModel::aggregationChanged, treeWidget, &TableToTreeWidget::changeAggregation);
     treeModel->addAggregatedColumns(2);
     treeModel->addAggregatedColumns(4);
+    treeWidget->getTreeView()->expandAll();
 
-    connect(treeModel, &TableToTreeModel::mappedSectionRoleChanged, treeWidget, &TableToTreeWidget::mappedSectionRoleChangedSlot);
+    connect(treeModel, &TableToTreeModel::mappedSectionRoleChanged, treeWidget, &TableToTreeWidget::changeMappedSectionRole);
 
     QPushButton* btn = new QPushButton;
     layout->addWidget(btn);

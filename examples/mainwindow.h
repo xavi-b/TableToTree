@@ -17,10 +17,10 @@
 class DemoTableModel : public QAbstractTableModel
 {
 public:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 };
 
 class DemoSortProxyModel : public QSortFilterProxyModel
@@ -29,7 +29,7 @@ class DemoSortProxyModel : public QSortFilterProxyModel
 
 public:
     DemoSortProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) { }
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
