@@ -4,6 +4,9 @@
 #include <set>
 #include <QAbstractTableModel>
 
+namespace XB
+{
+
 struct TableToTreeNode
 {
     ~TableToTreeNode()
@@ -78,5 +81,6 @@ signals:
     void aggregationChanged(TableToTreeModel* treeModel);
 };
 
+}
 
 #endif // TABLETOTREEMODEL_H

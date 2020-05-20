@@ -1,8 +1,11 @@
 #include "tabletotreewidget.h"
 
+namespace XB
+{
+
 void AggregationListWidget::dragMoveEvent(QDragMoveEvent* e)
 {
-    if (e->mimeData()->hasFormat(mimeDataType))
+    if (e->mimeData()->hasFormat(AggregationMimeDataType))
     {
         e->setDropAction(Qt::MoveAction);
         e->accept();
@@ -15,11 +18,11 @@ void AggregationListWidget::dragMoveEvent(QDragMoveEvent* e)
 
 void AggregationListWidget::dropEvent(QDropEvent* event)
 {
-    if (event->mimeData()->hasFormat(mimeDataType))
+    if (event->mimeData()->hasFormat(AggregationMimeDataType))
     {
         event->accept();
         event->setDropAction(Qt::MoveAction);
-        QByteArray ba = event->mimeData()->data(mimeDataType);
+        QByteArray ba = event->mimeData()->data(AggregationMimeDataType);
         QDataStream stream(&ba, QIODevice::ReadOnly);
         int column;
         QString name;
@@ -57,7 +60,7 @@ void AggregationListWidget::startDrag(Qt::DropActions supportedActions)
     QString name = item->text();
     stream << column;
     stream << name;
-    mimeData->setData(mimeDataType, ba);
+    mimeData->setData(AggregationMimeDataType, ba);
     QDrag* drag = new QDrag(this);
     drag->setMimeData(mimeData);
     int r = row(item);
@@ -73,7 +76,7 @@ void AggregationListWidget::startDrag(Qt::DropActions supportedActions)
 
 void AggregationListWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-    if (event->mimeData()->hasFormat(mimeDataType))
+    if (event->mimeData()->hasFormat(AggregationMimeDataType))
         event->accept();
     else
         event->ignore();
@@ -132,7 +135,7 @@ std::vector<int> AggregationListWidget::getAggregatedColumns() const
 
 void TableToTreeHeaderView::dragMoveEvent(QDragMoveEvent* e)
 {
-    if (e->mimeData()->hasFormat(mimeDataType))
+    if (e->mimeData()->hasFormat(AggregationMimeDataType))
     {
         e->setDropAction(Qt::MoveAction);
         e->accept();
@@ -145,7 +148,7 @@ void TableToTreeHeaderView::dragMoveEvent(QDragMoveEvent* e)
 
 void TableToTreeHeaderView::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->hasFormat(mimeDataType))
+    if (event->mimeData()->hasFormat(AggregationMimeDataType))
         event->accept();
     else
         event->ignore();
@@ -153,12 +156,12 @@ void TableToTreeHeaderView::dragEnterEvent(QDragEnterEvent *event)
 
 void TableToTreeHeaderView::dropEvent(QDropEvent *event)
 {
-    if (event->mimeData()->hasFormat(mimeDataType) && event->source() != this)
+    if (event->mimeData()->hasFormat(AggregationMimeDataType) && event->source() != this)
     {
         event->accept();
         event->setDropAction(Qt::MoveAction);
 
-//        QByteArray ba = event->mimeData()->data(mimeDataType);
+//        QByteArray ba = event->mimeData()->data(AggregationMimeDataType);
 //        QDataStream stream(&ba, QIODevice::ReadOnly);
 //        int column;
 //        QString name;
@@ -186,7 +189,7 @@ void TableToTreeHeaderView::mouseMoveEvent(QMouseEvent *event)
             QDataStream stream(&ba, QIODevice::WriteOnly);
             stream << this->model()->headerData(index, Qt::Horizontal, this->mappedSectionRole).toInt();
             stream << this->model()->headerData(index, Qt::Horizontal, Qt::DisplayRole).toString();
-            mimeData->setData(mimeDataType, ba);
+            mimeData->setData(AggregationMimeDataType, ba);
             QDrag* drag = new QDrag(this);
             drag->setMimeData(mimeData);
             if(drag->exec(Qt::MoveAction) == Qt::MoveAction)
@@ -265,4 +268,6 @@ void TableToTreeWidget::changeAggregation(TableToTreeModel* treeModel)
 void TableToTreeWidget::changeMappedSectionRole(TableToTreeModel* treeModel)
 {
     this->headerView->setMappedSectionRole(treeModel->getMappedSectionRole());
+}
+
 }

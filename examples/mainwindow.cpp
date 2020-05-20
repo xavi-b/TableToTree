@@ -70,9 +70,9 @@ MainWindow::MainWindow(QWidget *parent)
     tableView->setModel(tableModel);
     hlayout->addWidget(tableView);
 
-    TableToTreeModel* treeModel = new TableToTreeModel;
+    XB::TableToTreeModel* treeModel = new XB::TableToTreeModel;
     treeModel->setSourceModel(tableModel);
-    TableToTreeWidget* treeWidget = new TableToTreeWidget;
+    XB::TableToTreeWidget* treeWidget = new XB::TableToTreeWidget;
     DemoSortProxyModel* proxyModel = new DemoSortProxyModel;
     proxyModel->setSourceModel(treeModel);
     treeWidget->getTreeView()->setSortingEnabled(true);
@@ -80,13 +80,13 @@ MainWindow::MainWindow(QWidget *parent)
     treeWidget->changeAggregation(treeModel);
     hlayout->addWidget(treeWidget);
 
-    connect(treeWidget, &TableToTreeWidget::aggregationChanged, treeModel, &TableToTreeModel::setAggregatedColumns);
-    connect(treeModel, &TableToTreeModel::aggregationChanged, treeWidget, &TableToTreeWidget::changeAggregation);
+    connect(treeWidget, &XB::TableToTreeWidget::aggregationChanged, treeModel, &XB::TableToTreeModel::setAggregatedColumns);
+    connect(treeModel, &XB::TableToTreeModel::aggregationChanged, treeWidget, &XB::TableToTreeWidget::changeAggregation);
     treeModel->addAggregatedColumns(2);
     treeModel->addAggregatedColumns(4);
     treeWidget->getTreeView()->expandAll();
 
-    connect(treeModel, &TableToTreeModel::mappedSectionRoleChanged, treeWidget, &TableToTreeWidget::changeMappedSectionRole);
+    connect(treeModel, &XB::TableToTreeModel::mappedSectionRoleChanged, treeWidget, &XB::TableToTreeWidget::changeMappedSectionRole);
 
     QPushButton* btn = new QPushButton;
     layout->addWidget(btn);

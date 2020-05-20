@@ -12,7 +12,10 @@
 #include <QDrag>
 #include "tabletotreemodel.h"
 
-QString const mimeDataType = "application/x-item";
+namespace XB
+{
+
+QString const AggregationMimeDataType = "application/x-aggregation";
 
 class AggregationListWidget : public QListWidget
 {
@@ -78,5 +81,7 @@ public:
 signals:
     void aggregationChanged(std::vector<int> sections);
 };
+
+}
 
 #endif // TABLETOTREEWIDGET_H

@@ -1,5 +1,8 @@
 #include "tabletotreemodel.h"
 
+namespace XB
+{
+
 void TableToTreeModel::columnsInsertedSlot(const QModelIndex& parent, int first, int last)
 {
     for(auto& c : this->aggregatedColumns)
@@ -382,4 +385,6 @@ QModelIndex TableToTreeModel::mapToSource(const QModelIndex& proxyIndex) const
     if (!proxyIndex.isValid())
         return QModelIndex();
     return this->mapping.key(proxyIndex);
+}
+
 }
